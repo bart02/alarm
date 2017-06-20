@@ -66,6 +66,8 @@ void ReadDtmf() {
 
       if (temp == "\r\n+DTMF: 1\r\n") {
         Serial.println("1"); // выполняем команду 1
+        vvpar();
+        break;
 
       } else if (temp == "\r\n+DTMF: 2\r\n") {
         Serial.println("2"); // выполняем команду 2
@@ -115,5 +117,80 @@ String ReadGSM() {
     delay(10);
   }
   return v;
+}
+
+void vvpar() {
+  Serial.println("parol");
+  tmrpcm.play("parol.wav");
+  while (tmrpcm.isPlaying() == 1);
+  tmrpcm.disable();
+  int i = 0;
+
+  String vvpas;
+
+  while (1) { // в цикле
+    String temp;
+    temp = ReadGSM();
+    delay(500);
+    Serial.print("i = ");
+    Serial.println(i);
+    if (temp == "\r\n+DTMF: 1\r\n") {
+      Serial.println("1"); // выполняем команду 1
+      vvpas += '1';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 2\r\n") {
+      Serial.println("2"); // выполняем команду 2
+      vvpas += '2';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 3\r\n") {
+      Serial.println("3"); // выполняем команду 3
+      vvpas += '3';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 4\r\n") {
+      Serial.println("4"); // выполняем команду 4
+      vvpas += '4';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 5\r\n") {
+      Serial.println("5"); // выполняем команду 5
+      vvpas += '5';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 6\r\n") {
+      Serial.println("6"); // выполняем команду 6
+      vvpas += '6';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 7\r\n") {
+      Serial.println("7"); // выполняем команду 7
+      vvpas += '7';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 8\r\n") {
+      Serial.println("8"); // выполняем команду 8
+      vvpas += '8';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 9\r\n") {
+      Serial.println("9"); // выполняем команду 9
+      vvpas += '9';
+      i++;
+
+    } else if (temp == "\r\n+DTMF: 0\r\n") {
+      Serial.println("0"); // выполняем команду 0
+      vvpas += '0';
+      i++;
+    }
+    else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+      break;
+    }
+    if (i >= 5) {
+      Serial.println(vvpas);
+      break;
+    }
+  }
 }
 
