@@ -5,11 +5,11 @@
 
 SoftwareSerial gsm(7, 6); // RX, TX
 TMRpcm tmrpcm;
-
-const String phone = "9069595030";
+#define PHONE "9069595030"
+//char* phone = "9069595030";
 
 String input_string;
-
+boolean state = 1;
 
 void setup() {
   Serial.begin(9600);
@@ -42,12 +42,20 @@ int StrInt(String str) {
 
 void ReadDtmf() {
   Serial.println("RING!");
-  if (gsm.find(phone)) {
+  if (gsm.find(PHONE)) {
     gsm.println("AT+DDET=1");   // включаем DTMF
     delay(10);
     gsm.println("ATA");         // поднимаем трубку
     delay(500);
-    tmrpcm.play("parol.wav");
+    
+    if (state == 1) tmrpcm.play("vkl.wav");
+    else tmrpcm.play("vikl.wav");
+    
+    while (tmrpcm.isPlaying() == 1);
+    tmrpcm.disable();
+
+    tmrpcm.play("per.wav");
+    
     while (gsm.available()) gsm.read();
     input_string = "";
     while (!gsm.find("NO ")) {
