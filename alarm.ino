@@ -47,28 +47,55 @@ void ReadDtmf() {
     delay(10);
     gsm.println("ATA");         // поднимаем трубку
     delay(500);
-    
+
     if (state == 1) tmrpcm.play("vkl.wav");
     else tmrpcm.play("vikl.wav");
-    
+
     while (tmrpcm.isPlaying() == 1);
     tmrpcm.disable();
 
     tmrpcm.play("per.wav");
-    
-    while (gsm.available()) gsm.read();
-    input_string = "";
-    while (!gsm.find("NO ")) {
-      while (gsm.available()) {
-        char c = gsm.read();
-        if (c == '\n') {
-          if (StrInt(input_string) != 0) {
-            Serial.println(StrInt(input_string));
-          }
-          input_string = "";
-        } else {
-          input_string += c;
-        }
+
+    while (tmrpcm.isPlaying() == 1);
+    tmrpcm.disable();
+
+    while (1) { // в цикле
+      String temp;
+      temp = ReadGSM();
+      delay(500);
+
+      if (temp == "\r\n+DTMF: 1\r\n") {
+        Serial.println("1"); // выполняем команду 1
+
+      } else if (temp == "\r\n+DTMF: 2\r\n") {
+        Serial.println("2"); // выполняем команду 2
+
+      } else if (temp == "\r\n+DTMF: 3\r\n") {
+        Serial.println("3"); // выполняем команду 3
+
+      } else if (temp == "\r\n+DTMF: 4\r\n") {
+        Serial.println("4"); // выполняем команду 4
+
+      } else if (temp == "\r\n+DTMF: 5\r\n") {
+        Serial.println("5"); // выполняем команду 5
+
+      } else if (temp == "\r\n+DTMF: 6\r\n") {
+        Serial.println("6"); // выполняем команду 6
+
+      } else if (temp == "\r\n+DTMF: 7\r\n") {
+        Serial.println("7"); // выполняем команду 7
+
+      } else if (temp == "\r\n+DTMF: 8\r\n") {
+        Serial.println("8"); // выполняем команду 8
+
+      } else if (temp == "\r\n+DTMF: 9\r\n") {
+        Serial.println("9"); // выполняем команду 9
+
+      } else if (temp == "\r\n+DTMF: 0\r\n") {
+        Serial.println("0"); // выполняем команду 0
+      }
+      else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+        break;
       }
     }
     gsm.println("ATH0");         // на всякий случай сбросим вызов
@@ -77,5 +104,16 @@ void ReadDtmf() {
     gsm.println("ATH0");
     Serial.println("NUM.ERROR. OK!");
   }
+}
+
+String ReadGSM() {
+  int c;
+  String v;
+  while (gsm.available()) { //сохраняем входную строку в переменную v
+    c = gsm.read();
+    v += char(c);
+    delay(10);
+  }
+  return v;
 }
 
