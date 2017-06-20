@@ -13,10 +13,10 @@ void setup() {
   gsm.begin(9600);
   tmrpcm.speakerPin = 9; // Динамик подключен к 9 - pin.
   if (!SD.begin(4)); // Здесь можно изменить № pin-CS - pin 4.
-gsm.println("AT+CLIP=1");
+  gsm.println("AT+CLIP=1");
   gsm.println("ATE0");          // выключаем эхо
   //gsm.println("AT+CFUN=1,1");
-  
+
 }
 
 void loop() {
