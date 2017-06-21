@@ -66,7 +66,13 @@ void ReadDtmf() {
 
       if (temp == "\r\n+DTMF: 1\r\n") {
         Serial.println("1"); // выполняем команду 1
-        vvpar();
+        if (vvpar() == 1) {
+          state = 0;
+          tmrpcm.play("verno.wav");
+        }
+        else tmrpcm.play("neverno.wav");
+        while (tmrpcm.isPlaying() == 1);
+    tmrpcm.disable();
         break;
 
       } else if (temp == "\r\n+DTMF: 2\r\n") {
@@ -119,7 +125,7 @@ String ReadGSM() {
   return v;
 }
 
-void vvpar() {
+boolean vvpar() {
   Serial.println("parol");
   tmrpcm.play("parol.wav");
   while (tmrpcm.isPlaying() == 1);
@@ -189,7 +195,8 @@ void vvpar() {
     }
     if (i >= 5) {
       Serial.println(vvpas);
-      break;
+      if (vvpas == "12345") return 1;
+      else return 0;
     }
   }
 }
