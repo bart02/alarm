@@ -9,32 +9,16 @@ TMRpcm tmrpcm;
 
 boolean state = 1;
 
-void setup() {
-  tmrpcm.speakerPin = 9; // Динамик подключен к 9 - pin.
-  if (!SD.begin(4)); // Здесь можно изменить № pin-CS - pin 4.
-  
-  Serial.begin(9600);
-  gsm.begin(9600);
-  
-  gsm.println("AT+CLIP=1");
-  gsm.println("ATE0");          
-}
 
-void loop() {
-  gsm.println("AT");            // иначе модем засыпает
-
-  if (gsm.find("RING")) {       // если нашли RING
-    ReadDtmf();
+String ReadGSM() {
+  int c;
+  String v;
+  while (gsm.available()) { //сохраняем входную строку в переменную v
+    c = gsm.read();
+    v += char(c);
+    delay(10);
   }
-}
-
-int StrInt(String str) {
-  String outstr;
-  for (int i = 0; i < str.length(); i++) {
-    outstr = str.substring(i);
-    if (outstr.toInt() != 0) break;
-  }
-  return outstr.toInt();
+  return v;
 }
 
 void ReadDtmf() {
@@ -89,17 +73,6 @@ void ReadDtmf() {
     gsm.println("ATH0");
     Serial.println("NUM.ERROR. OK!");
   }
-}
-
-String ReadGSM() {
-  int c;
-  String v;
-  while (gsm.available()) { //сохраняем входную строку в переменную v
-    c = gsm.read();
-    v += char(c);
-    delay(10);
-  }
-  return v;
 }
 
 boolean vvpar() {
@@ -175,6 +148,31 @@ boolean vvpar() {
       if (vvpas == "12345") return 1;
       else return 0;
     }
+  }
+}
+
+void plays(String fn) {
+  tmrpcm.play(fn.c_str());
+  while (tmrpcm.isPlaying() == 1);
+  tmrpcm.disable();
+}
+
+void setup() {
+  tmrpcm.speakerPin = 9; // Динамик подключен к 9 - pin.
+  if (!SD.begin(4)); // Здесь можно изменить № pin-CS - pin 4.
+  
+  Serial.begin(9600);
+  gsm.begin(9600);
+  
+  gsm.println("AT+CLIP=1");
+  gsm.println("ATE0");          
+}
+
+void loop() {
+  gsm.println("AT");            // иначе модем засыпает
+
+  if (gsm.find("RING")) {       // если нашли RING
+    ReadDtmf();
   }
 }
 
