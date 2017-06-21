@@ -66,43 +66,23 @@ void ReadDtmf() {
 
       if (temp == "\r\n+DTMF: 1\r\n") {
         Serial.println("1"); // выполняем команду 1
-        if (vvpar() == 1) {
-          state = 0;
-          tmrpcm.play("verno.wav");
+        if (state == 1) {
+          if (vvpar() == 1) {
+            state = 0;
+            tmrpcm.play("verno.wav");
+          }
+          else tmrpcm.play("neverno.wav");
+
+          while (tmrpcm.isPlaying() == 1);
+          tmrpcm.disable();
+        } else {
+          state = 1;
+          tmrpcm.play("vkl.wav");
+          while (tmrpcm.isPlaying() == 1);
+          tmrpcm.disable();
         }
-        else tmrpcm.play("neverno.wav");
-        while (tmrpcm.isPlaying() == 1);
-    tmrpcm.disable();
         break;
-
-      } else if (temp == "\r\n+DTMF: 2\r\n") {
-        Serial.println("2"); // выполняем команду 2
-
-      } else if (temp == "\r\n+DTMF: 3\r\n") {
-        Serial.println("3"); // выполняем команду 3
-
-      } else if (temp == "\r\n+DTMF: 4\r\n") {
-        Serial.println("4"); // выполняем команду 4
-
-      } else if (temp == "\r\n+DTMF: 5\r\n") {
-        Serial.println("5"); // выполняем команду 5
-
-      } else if (temp == "\r\n+DTMF: 6\r\n") {
-        Serial.println("6"); // выполняем команду 6
-
-      } else if (temp == "\r\n+DTMF: 7\r\n") {
-        Serial.println("7"); // выполняем команду 7
-
-      } else if (temp == "\r\n+DTMF: 8\r\n") {
-        Serial.println("8"); // выполняем команду 8
-
-      } else if (temp == "\r\n+DTMF: 9\r\n") {
-        Serial.println("9"); // выполняем команду 9
-
-      } else if (temp == "\r\n+DTMF: 0\r\n") {
-        Serial.println("0"); // выполняем команду 0
-      }
-      else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+      } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
         break;
       }
     }
