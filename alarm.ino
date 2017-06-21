@@ -6,20 +6,18 @@
 SoftwareSerial gsm(7, 6); // RX, TX
 TMRpcm tmrpcm;
 #define PHONE "9069595030"
-//char* phone = "9069595030";
 
-String input_string;
 boolean state = 1;
 
 void setup() {
-  Serial.begin(9600);
-  gsm.begin(9600);
   tmrpcm.speakerPin = 9; // Динамик подключен к 9 - pin.
   if (!SD.begin(4)); // Здесь можно изменить № pin-CS - pin 4.
+  
+  Serial.begin(9600);
+  gsm.begin(9600);
+  
   gsm.println("AT+CLIP=1");
-  gsm.println("ATE0");          // выключаем эхо
-  //gsm.println("AT+CFUN=1,1");
-
+  gsm.println("ATE0");          
 }
 
 void loop() {
@@ -28,7 +26,6 @@ void loop() {
   if (gsm.find("RING")) {       // если нашли RING
     ReadDtmf();
   }
-  //gsm.println("ATH0");
 }
 
 int StrInt(String str) {
