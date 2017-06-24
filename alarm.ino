@@ -29,16 +29,10 @@ void ReadDtmf() {
     gsm.println("ATA");         // поднимаем трубку
     delay(500);
 
-    if (state == 1) tmrpcm.play("vkl.wav");
-    else tmrpcm.play("vikl.wav");
+    if (state == 1) plays("vkl.wav");
+    else plays("vikl.wav");
 
-    while (tmrpcm.isPlaying() == 1);
-    tmrpcm.disable();
-
-    tmrpcm.play("per.wav");
-
-    while (tmrpcm.isPlaying() == 1);
-    tmrpcm.disable();
+    plays("per.wav");
 
     while (1) { // в цикле
       String temp;
@@ -50,17 +44,12 @@ void ReadDtmf() {
         if (state == 1) {
           if (vvpar() == 1) {
             state = 0;
-            tmrpcm.play("verno.wav");
+            plays("verno.wav");
           }
-          else tmrpcm.play("neverno.wav");
-
-          while (tmrpcm.isPlaying() == 1);
-          tmrpcm.disable();
+          else plays("neverno.wav");
         } else {
           state = 1;
-          tmrpcm.play("vkl.wav");
-          while (tmrpcm.isPlaying() == 1);
-          tmrpcm.disable();
+          plays("vkl.wav");
         }
         break;
       } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
@@ -77,9 +66,7 @@ void ReadDtmf() {
 
 boolean vvpar() {
   Serial.println("parol");
-  tmrpcm.play("parol.wav");
-  while (tmrpcm.isPlaying() == 1);
-  tmrpcm.disable();
+  plays("parol.wav");
   int i = 0;
 
   String vvpas;
