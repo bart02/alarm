@@ -3,6 +3,7 @@
 #define SIMTX   6
 #define SPEAKER 9
 #define SDPIN   4
+#define MGPIN   3
 
 #include <SoftwareSerial.h>
 #include <SPI.h>
@@ -12,7 +13,21 @@
 SoftwareSerial gsm(SIMRX, SIMTX); // RX, TX
 TMRpcm tmrpcm;
 
-boolean state = 1;
+boolean state;
+
+void alarm() {
+  Serial.println("alarm");
+}
+
+void StateTo(boolean st) {
+  if (st == 1) {
+    state = 1;
+    attachInterrupt(1, alarm, RISING);
+  } else {
+    state = 0;
+    detachInterrupt(1);
+  }
+}
 
 String ReadGSM() {
   int c;
@@ -47,12 +62,12 @@ void ReadDtmf() {
         Serial.println("1"); // выполняем команду 1
         if (state == 1) {
           if (vvpar() == 1) {
-            state = 0;
+            StateTo(0);
             plays("verno.wav");
           }
           else plays("neverno.wav");
         } else {
-          state = 1;
+          StateTo(1);
           plays("vkl.wav");
         }
         break;
@@ -149,14 +164,16 @@ void plays(String fn) {
 }
 
 void setup() {
+  pinMode(MGPIN, INPUT_PULLUP);
+  StateTo(1);
   tmrpcm.speakerPin = SPEAKER; // Динамик подключен к 9 - pin.
   if (!SD.begin(SDPIN)); // Здесь можно изменить № pin-CS - pin 4.
-  
+
   Serial.begin(9600);
   gsm.begin(9600);
-  
+
   gsm.println("AT+CLIP=1");
-  gsm.println("ATE0");          
+  gsm.println("ATE0");
 }
 
 void loop() {
