@@ -185,6 +185,41 @@ void plays(String fn) {
   tmrpcm.disable();
 }
 
+void AlarmCall() {
+  Serial.println("alarm");
+  delay(1000);
+  gsm.println("AT+DDET=1");
+  delay(10);
+  gsm.print("ATD+7");
+  gsm.print(PHONE);
+  gsm.println(";");
+
+  while (1) { // в цикле
+
+    String temp;
+    temp = ReadGSM();
+    delay(500);
+
+    if (temp == "\r\n+DTMF: 1\r\n") {
+      Serial.println("1"); // выполняем команду 1
+      plays("vskr.wav");
+      al = 0;
+      break;
+    } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+      al = 0;
+      break;
+    } else if (temp == "\r\nBUSY\r\n") { // если пришел отбой -выходим из цикла
+      break;
+    } else if (temp == "\r\nNO ANSWER\r\n") { // если пришел отбой -выходим из цикла
+      break;
+    } else if (temp == "\r\nNO DIALTONE\r\n") { // если пришел отбой -выходим из цикла
+      break;
+    }
+  }
+  gsm.println("ATH0");         // на всякий случай сбросим вызов
+  Serial.println("OK!");
+}
+
 void setup() {
   pinMode(MGPIN, INPUT_PULLUP);
   StateTo(1);
@@ -197,39 +232,14 @@ void setup() {
   gsm.println("ATH0");
   gsm.println("AT+CLIP=1");
   gsm.println("ATE0");
+
+  if (digitalRead(3) == 1) alarm();
 }
 
 void loop() {
   gsm.println("AT");            // иначе модем засыпает
   if (al) {
-    Serial.println("alarm");
-    delay(10);
-    gsm.println("AT+DDET=1");
-    delay(10);
-    gsm.print("ATD+7");
-    gsm.print(PHONE);
-    gsm.println(";");
-
-    while (1) { // в цикле
-
-      String temp;
-      temp = ReadGSM();
-      delay(500);
-
-      if (temp == "\r\n+DTMF: 1\r\n") {
-        Serial.println("1"); // выполняем команду 1
-        plays("vskr.wav");
-        al = 0;
-        break;
-      } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
-        al = 0;
-        break;
-      } else if (temp == "\r\nBUSY\r\n") { // если пришел отбой -выходим из цикла
-        break;
-      }
-    }
-    gsm.println("ATH0");         // на всякий случай сбросим вызов
-    Serial.println("OK!");
+    AlarmCall();
   }
   if (gsm.find("RING")) {       // если нашли RING
     ReadDtmf();
