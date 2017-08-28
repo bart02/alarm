@@ -14,9 +14,14 @@ SoftwareSerial gsm(SIMRX, SIMTX); // RX, TX
 TMRpcm tmrpcm;
 
 boolean state;
+volatile boolean al = 0;
+volatile boolean vskr = 0;
+
+void(* resetFunc) (void) = 0; // объявляем функцию reset
 
 void alarm() {
-  Serial.println("alarm");
+  al = 1;
+  vskr = 1;
 }
 
 void StateTo(boolean st) {
@@ -48,31 +53,48 @@ void ReadDtmf() {
     gsm.println("ATA");         // поднимаем трубку
     delay(500);
 
-    if (state == 1) plays("vkl.wav");
-    else plays("vikl.wav");
+    if (vskr) {
+      plays("vskr.wav");
+      while (1) { // в цикле
+        String temp;
+        temp = ReadGSM();
+        delay(500);
 
-    plays("per.wav");
-
-    while (1) { // в цикле
-      String temp;
-      temp = ReadGSM();
-      delay(500);
-
-      if (temp == "\r\n+DTMF: 1\r\n") {
-        Serial.println("1"); // выполняем команду 1
-        if (state == 1) {
-          if (vvpar() == 1) {
-            StateTo(0);
-            plays("verno.wav");
-          }
-          else plays("neverno.wav");
-        } else {
-          StateTo(1);
-          plays("vkl.wav");
+        if (temp == "\r\n+DTMF: 1\r\n") {
+          Serial.println("1"); // выполняем команду 1
+          resetFunc(); //вызываем reset
+          break;
+        } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+          break;
         }
-        break;
-      } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
-        break;
+      }
+    } else {
+      if (state == 1) plays("vkl.wav");
+      else plays("vikl.wav");
+
+      plays("per.wav");
+
+      while (1) { // в цикле
+        String temp;
+        temp = ReadGSM();
+        delay(500);
+
+        if (temp == "\r\n+DTMF: 1\r\n") {
+          Serial.println("1"); // выполняем команду 1
+          if (state == 1) {
+            if (vvpar() == 1) {
+              StateTo(0);
+              plays("verno.wav");
+            }
+            else plays("neverno.wav");
+          } else {
+            StateTo(1);
+            plays("vkl.wav");
+          }
+          break;
+        } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+          break;
+        }
       }
     }
     gsm.println("ATH0");         // на всякий случай сбросим вызов
@@ -172,13 +194,43 @@ void setup() {
   Serial.begin(9600);
   gsm.begin(9600);
 
+  gsm.println("ATH0");
   gsm.println("AT+CLIP=1");
   gsm.println("ATE0");
 }
 
 void loop() {
   gsm.println("AT");            // иначе модем засыпает
+  if (al) {
+    Serial.println("alarm");
+    delay(10);
+    gsm.println("AT+DDET=1");
+    delay(10);
+    gsm.print("ATD+7");
+    gsm.print(PHONE);
+    gsm.println(";");
 
+    while (1) { // в цикле
+
+      String temp;
+      temp = ReadGSM();
+      delay(500);
+
+      if (temp == "\r\n+DTMF: 1\r\n") {
+        Serial.println("1"); // выполняем команду 1
+        plays("vskr.wav");
+        al = 0;
+        break;
+      } else if (temp == "\r\nNO CARRIER\r\n") { // если пришел отбой -выходим из цикла
+        al = 0;
+        break;
+      } else if (temp == "\r\nBUSY\r\n") { // если пришел отбой -выходим из цикла
+        break;
+      }
+    }
+    gsm.println("ATH0");         // на всякий случай сбросим вызов
+    Serial.println("OK!");
+  }
   if (gsm.find("RING")) {       // если нашли RING
     ReadDtmf();
   }
