@@ -1,14 +1,18 @@
+#define PHONE   "9069595030"
+#define SIMRX   7
+#define SIMTX   6
+#define SPEAKER 9
+#define SDPIN   4
+
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include <SD.h>
 #include <TMRpcm.h>
 
-SoftwareSerial gsm(7, 6); // RX, TX
+SoftwareSerial gsm(SIMRX, SIMTX); // RX, TX
 TMRpcm tmrpcm;
-#define PHONE "9069595030"
 
 boolean state = 1;
-
 
 String ReadGSM() {
   int c;
@@ -145,8 +149,8 @@ void plays(String fn) {
 }
 
 void setup() {
-  tmrpcm.speakerPin = 9; // Динамик подключен к 9 - pin.
-  if (!SD.begin(4)); // Здесь можно изменить № pin-CS - pin 4.
+  tmrpcm.speakerPin = SPEAKER; // Динамик подключен к 9 - pin.
+  if (!SD.begin(SDPIN)); // Здесь можно изменить № pin-CS - pin 4.
   
   Serial.begin(9600);
   gsm.begin(9600);
