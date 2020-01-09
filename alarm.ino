@@ -20,8 +20,10 @@ volatile boolean vskr = 0;
 void(* resetFunc) (void) = 0; // объявляем функцию reset
 
 void alarm() {
-  al = 1;
-  vskr = 1;
+  if (digitalRead(MGPIN)) {
+    al = 1;
+    vskr = 1;
+  }
 }
 
 void StateTo(boolean st) {
@@ -232,8 +234,6 @@ void setup() {
   gsm.println("ATH0");
   gsm.println("AT+CLIP=1");
   gsm.println("ATE0");
-
-  if (digitalRead(3) == 1) alarm();
 }
 
 void loop() {
