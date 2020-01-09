@@ -1,9 +1,9 @@
-#define PHONE   "9069595030"
-#define SIMRX   7
-#define SIMTX   6
-#define SPEAKER 9
-#define SDPIN   4
-#define MGPIN   3
+#define PHONE   "9069595030" // номер телефона для звонков, они будут приниматься только с этого номера
+#define SIMRX   7 // пин RX SIM800L
+#define SIMTX   6 // пин TX SIM800L
+#define SPEAKER 9 // пин соединенный с передачей звука на SIM800L
+#define SDPIN   4 // пин SD карты
+#define MGPIN   3 // пин SD карты
 
 #include <SoftwareSerial.h>
 #include <SPI.h>
